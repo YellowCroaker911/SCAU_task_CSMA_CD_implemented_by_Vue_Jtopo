@@ -14,9 +14,7 @@ import {
     Shape
 } from '@jtopo/core';
 
-import {
-    customObject
-} from './CustomObject';
+import { customObject } from './CustomObject';
 
 class Provider {
 
@@ -58,10 +56,10 @@ class Provider {
     }
 
     updateNode(node) {
-        if (node.text.startsWith('终端')) {
+        if (node.userData.customClassName == 'HostNode') {
             node.setText('终端' + node.x.toFixed(0).toString() + ":" + node.y.toFixed(0).toString())
-        } else if (node.text.startsWith('连接点')) {
-            node.setText('连接点' + node.x.toFixed(0).toString() + ":" + node.y.toFixed(0).toString())
+        } else if (node.userData.customClassName == 'JuncionNode') {
+            // node.setText('连接点' + node.x.toFixed(0).toString() + ":" + node.y.toFixed(0).toString())
         }
         let links = node.getLinks();
         links.forEach(link => {

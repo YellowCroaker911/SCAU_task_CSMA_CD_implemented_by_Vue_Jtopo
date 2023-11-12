@@ -21,6 +21,12 @@ class CustomObject {
         node.setUserData({
             customClassName: 'HostNode',
             owner: null,
+            timeStamp: Date.now(),
+            state: '监听-信道闲',
+            transmissionStamp: null,
+            withdrawStamp: null,
+            sendTime: 10000,
+            withdrawTime: null,
         });
         node.setShape(Shape.polygon(6));
         node.css({
@@ -32,10 +38,11 @@ class CustomObject {
     }
 
     juncionNode(text, x, y, h, w) {
-        let node = new Node(text, x, y, h, w);
+        let node = new Node("", x, y, h, w);
         node.setUserData({
             customClassName: 'JuncionNode',
             owner: null,
+            timeStamp: Date.now(),
         });
         node.setShape(Shape.polygon(12));
         node.css({
@@ -51,20 +58,24 @@ class CustomObject {
         link.setUserData({
             customClassName: 'ChannelLink',
             owner: null,
+            animate: null,
+            timeStamp: Date.now(),
         });
         link.css({
+            lineDash: [6, 2],
             lineWidth: '3',
+            strokeStyle: 'black',
         });
         return link;
     }
 
-    frameNode(originNode, goalNode, beginNode) {
+    frameNode(originNode, goalNode) {
         let node = new Node('', 0, 0, 20, 10);
         node.setUserData({
             customClassName: 'FrameNode',
             owner: originNode,
+            timeStamp: Date.now(),
             goal: goalNode,
-            begin: beginNode,
         });
         node.css({
             background: node.userData.owner.style.fillStyle,

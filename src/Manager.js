@@ -14,8 +14,8 @@ import {
     Shape,
     PopupMenu
 } from '@jtopo/core';
-import { provider } from './Provider'
-import { simulator } from './Simulator';
+import { provider } from './Provider';
+import { Simulator } from './Simulator';
 
 class Manager {
     stage;
@@ -31,70 +31,69 @@ class Manager {
         this.stage = stage;
         this.layer = layer;
 
-
         this.loadConfig();
         this.initEvent();
-        this.test();
     }
 
     loadConfig() {
         const stage = this.stage;
         const layer = this.layer;
         layer.css({
-            background: 'white'
+            background: 'white',
         });
-        var cnt = 0;
+
+        var cnt;
         let toRemoveSearchBox = stage.toolbar.domObj.childNodes;
+        let toRemoveGroup = [];
         toRemoveSearchBox.forEach(group => {
-            if (cnt == 5) {
+            toRemoveGroup.push(group);
+        });
+        cnt = 0;
+        toRemoveGroup.forEach(group => {
+            if (cnt == 3 || cnt == 5) {
                 group.remove();
             }
             cnt = cnt + 1;
         });
-        let buttons = stage.toolbar.buttons;
-        let toRemoveButtons = [];
-        cnt = 0;
-        toRemoveButtons.forEach(button => {
-            if (cnt == 10 || cnt == 11 || cnt == 12) {
-                button.remove();
+
+        stage.toolbar.fileInput.addEventListener('change', () => {
+            let sleep = time => {
+                return new Promise(resolve => setTimeout(resolve, time));
             }
-            cnt = cnt + 1;
-        });
-        var click_load_file = false;
-        buttons.forEach(button => {
-            toRemoveButtons.push(button);
-            if (button.title == "打开本地文件") {
-                button.addEventListener('mouseup', () => {
-                    click_load_file = true;
+            sleep(100).then(() => {
+                layer.css({
+                    background: 'white',
                 });
-                button.addEventListener('mouseout', () => {
-                    if (click_load_file == true) {
-                        layer.css({
-                            background: 'white'
+                layer.getChildren().forEach(child => {
+                    if (child.className == 'Node') {
+                        child.on('mousedragend', () => {
+                            provider.updateNode(child);
                         });
-                        layer.getChildren().forEach(child => {
-                            if (child.className == 'Node') {
-                                child.on('mousedragend', () => {
-                                    provider.updateNode(child);
-                                });
-                            }
-                        });
-                        click_load_file = false;
                     }
                 });
-            }
+            })
         });
+
+        let img = document.createElement('img');
+        img.src = 'imges\\查看.svg';
+        img.style.width = '24px';
+        img.style.height = 'auto';
+        let bt = document.createElement('button');
+        bt.title = '显示日志';
+        bt.appendChild(img);
+        stage.toolbar.domObj.appendChild(bt);
+
     }
 
     initEvent() {
         const stage = this.stage;
         const layer = this.layer;
 
-        const as = stage.animationSystem;
         const is = stage.inputSystem;
         const pm1 = new PopupMenu(stage);
         const pm2 = new PopupMenu(stage);
         const pm3 = new PopupMenu(stage);
+        const simulator = new Simulator(stage);
 
         var tempNode;
         var choose_connect;
@@ -154,7 +153,7 @@ class Manager {
             let y = is.y;
             if (button == 0) {
                 if (choose_connect == true) {
-                    if (target != null && target.className == 'Node') {
+                    if (target != null && target != tempNode && target.className == 'Node') {
                         let link = provider.newLink(tempNode, target);
                         if (link != null) {
                             layer.addChild(link);
@@ -163,12 +162,12 @@ class Manager {
                     choose_connect = false;
                 }
                 if (choose_send == true) {
-                    if (target != null && target.userData.customClassName == 'HostNode') {
-                        simulator.broadcast(tempNode, target, as);
+                    if (target != null && target != tempNode && target.userData.customClassName == 'HostNode') {
+                        simulator.broadcast(tempNode, target, stage);
                     }
                     choose_send = false;
                 }
-                console.log("target", target);
+
             } else if (button == 2) {
                 if (target == null) {
                     pm1.showAt(x, y);
@@ -177,19 +176,14 @@ class Manager {
                 } else if (target.userData.customClassName == 'JuncionNode') {
                     pm3.showAt(x, y);
                 }
+            } else if (button == 1) {
+                console.warn("target", target);
             }
         });
         is.on('mousedown', () => {
             pm1.hide();
             pm2.hide();
         });
-    }
-
-    test() {
-        const stage = this.stage;
-        const layer = this.layer;
-        let is = stage.inputSystem;
-        is.on('mouseup', () => {});
     }
 }
 
