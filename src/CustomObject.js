@@ -1,15 +1,6 @@
 import {
-    Stage,
-    Layer,
     Node,
-    TextNode,
-    TipNode,
-    CircleNode,
     Link,
-    AutoFoldLink,
-    CurveLink,
-    ArcLink,
-    BezierLink,
     randomColor,
     Shape
 } from '@jtopo/core';
@@ -25,8 +16,10 @@ class CustomObject {
             state: '监听-信道闲',
             transmissionStamp: null,
             withdrawStamp: null,
-            sendTime: 10000,
             withdrawTime: null,
+            goals: null,
+            times: null,
+            collisions: 0,
         });
         node.setShape(Shape.polygon(6));
         node.css({

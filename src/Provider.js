@@ -1,21 +1,3 @@
-import {
-    Stage,
-    Layer,
-    Node,
-    TextNode,
-    TipNode,
-    CircleNode,
-    Link,
-    AutoFoldLink,
-    CurveLink,
-    ArcLink,
-    BezierLink,
-    randomColor,
-    Shape
-} from '@jtopo/core';
-
-import { customObject } from './CustomObject';
-
 class Provider {
 
     newNode(mode, x, y) {

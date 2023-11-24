@@ -1,21 +1,11 @@
 import {
     Stage,
     Layer,
-    Node,
-    TextNode,
-    TipNode,
-    CircleNode,
-    Link,
-    AutoFoldLink,
-    CurveLink,
-    ArcLink,
-    BezierLink,
-    randomColor,
-    Shape,
     PopupMenu
 } from '@jtopo/core';
 import { provider } from './Provider';
-import { Simulator } from './Simulator';
+import { Executor } from './Executor';
+import { constant } from './Constant';
 
 class Manager {
     stage;
@@ -30,6 +20,7 @@ class Manager {
 
         this.stage = stage;
         this.layer = layer;
+        this.executor = new Executor(stage, layer);
 
         this.loadConfig();
         this.initEvent();
@@ -69,19 +60,37 @@ class Manager {
                         child.on('mousedragend', () => {
                             provider.updateNode(child);
                         });
+                        if (child.userData.customClassName == 'HostNode') {
+                            child.userData.goals = [];
+                            child.userData.times = [];
+                            child.userData.collisions = 0; // 使用新的json文件存档时可以将这行删除
+                        }
                     }
                 });
             })
         });
 
         let img = document.createElement('img');
-        img.src = 'imges\\查看.svg';
+        img.src = 'imges\\开始.svg';
         img.style.width = '24px';
         img.style.height = 'auto';
         let bt = document.createElement('button');
-        bt.title = '显示日志';
+        bt.title = '开始模拟';
         bt.appendChild(img);
         stage.toolbar.domObj.appendChild(bt);
+
+        bt.addEventListener("click", () => {
+            this.executor.execute();
+        })
+
+        // img = document.createElement('img');
+        // img.src = 'imges\\查看.svg';
+        // img.style.width = '24px';
+        // img.style.height = 'auto';
+        // bt = document.createElement('button');
+        // bt.title = '输出日志';
+        // bt.appendChild(img);
+        // stage.toolbar.domObj.appendChild(bt);
 
     }
 
@@ -93,7 +102,6 @@ class Manager {
         const pm1 = new PopupMenu(stage);
         const pm2 = new PopupMenu(stage);
         const pm3 = new PopupMenu(stage);
-        const simulator = new Simulator(stage);
 
         var tempNode;
         var choose_connect;
@@ -163,7 +171,7 @@ class Manager {
                 }
                 if (choose_send == true) {
                     if (target != null && target != tempNode && target.userData.customClassName == 'HostNode') {
-                        simulator.broadcast(tempNode, target, stage);
+                        this.executor.addPackage(tempNode, target, constant.SEND_TIME);
                     }
                     choose_send = false;
                 }
