@@ -11,12 +11,14 @@ export class Simulator {
         }
     }
 
+    // 广播，开始发送和结束发送时调用，产生一个代表首帧和尾帧的动画块frameNode
     broadcast(originNode, goalNode) {
         let frameNode = customObject.frameNode(originNode, goalNode);
         this.updateNodeState(originNode, frameNode);
         this.forward(originNode, goalNode, originNode, null)
     }
 
+    // 转发动画块frameNode（销毁原有的，根据要转发的信道生成新的），在连接点处转发
     forward(originNode, goalNode, beginNode, fromLink) {
         let links = beginNode.getLinks();
         links.forEach(link => {
@@ -26,6 +28,11 @@ export class Simulator {
         });
     }
 
+    /*
+    动画块frameNode通过信道，绘制动画，
+    到达新的节点后更新节点状态/占有者（状态/占有者更新后,也会更新节点、信道的颜色，或者改变一些特效)
+    接着再转发动画块
+    */
     pass(originNode, goalNode, beginNode, link) {
         let as = this.stage.animationSystem;
         let frameNode = customObject.frameNode(originNode, goalNode);
@@ -58,6 +65,7 @@ export class Simulator {
         });
     }
 
+    // 根据题目要求进行状态/占有者的判断和转换
     updateNodeState(node, frameNode) {
         if (node.userData.customClassName == 'HostNode') {
             if (node.userData.state == '监听-信道闲') {
@@ -191,6 +199,11 @@ export class Simulator {
         return true;
     }
 
+    /*
+    更新占有者，下面主要用于节点、信道的颜色，改变特效
+    先更新节点的再更新信道的
+    因为信道的更新依赖于其链接的两个节点
+    */
     changeNodeOwner(node, owner) {
         node.userData.owner = owner;
         node.userData.timeStamp = Date.now();
@@ -209,6 +222,7 @@ export class Simulator {
         });
     }
 
+    // 更新信道
     changeLinkOwner(link) {
         let es = this.stage.effectSystem;
 
@@ -236,6 +250,7 @@ export class Simulator {
         }
     }
 
+    // 在传输（发送和接收）的开始和结束时调用
     transmission_call(node, mode, state1, state2) {
         if (mode == '开始') {
             node.userData.transmissionStamp = Date.now();
@@ -255,6 +270,7 @@ export class Simulator {
             node.removeAllChild();
             if (state1 == '发送') {
                 if (state2 == '监听-信道闲') {
+                    // 正常结束发送，弹出数据队列头的数据包
                     node.userData.goals.shift();
                     node.userData.times.shift();
                     node.userData.collisions = 0;
@@ -263,6 +279,7 @@ export class Simulator {
         }
     }
 
+    // 在进入退避态时调用
     withdraw_call(node) {
         if (node.userData.customClassName == 'HostNode') {
             node.userData.withdrawTime = this.withdraw_time(node.userData.collisions);
@@ -282,6 +299,7 @@ export class Simulator {
         }
     }
 
+    // 根据CSMA/CD算法计算退避时间
     withdraw_time(k) {
         if (k > 10) {
             k = 10;
@@ -292,6 +310,7 @@ export class Simulator {
         return coe * two_tao;
     }
 
+    // 在连接点处发生碰撞时调用，用于产生特效
     cloosion_call(node) {
         let ae = this.stage.effectSystem.rippling({
             count: 4,
@@ -306,6 +325,7 @@ export class Simulator {
         });
     }
 
+    // 根据状态转换情况输出日志信息
     consoleState(state1, state2, node) {
         var text = '';
         if (state1 == '监听-信道闲') {
@@ -369,6 +389,7 @@ export class Simulator {
         }
     }
 
+    // 对日志信息进行简单封装，方便输出
     msg(node, state1, state2, text) {
         let date = new Date();
         let color = node.style.fillStyle;

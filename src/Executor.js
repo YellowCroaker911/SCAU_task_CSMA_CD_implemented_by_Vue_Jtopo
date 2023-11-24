@@ -12,6 +12,7 @@ export class Executor {
         }
     }
 
+    // 执行模拟，每持续一段很小的时间就调用send函数来模拟节点需要发送数据
     execute() {
         let childs = this.layer.getChildren();
         let hostNodeChilds = []
@@ -28,6 +29,7 @@ export class Executor {
         }, 0.1);
     }
 
+    // 随机生成一些数据包（发送任务）分配到局域网的节点中
     randAddPackage(hostNodeChilds, times) {
         let len = hostNodeChilds.length;
         if (len < 2) {
@@ -50,12 +52,18 @@ export class Executor {
         }
     }
 
+    // 新增一个数据包（发送任务），用于Manager那边通过鼠标点击直接调用
     addPackage(origin, goal, time) {
         origin.userData.goals.push(goal);
         origin.userData.times.push(time);
     }
 
-
+    /*
+    执行节点的数据发送，
+    如果节点处于信道闲状态并且有数据要发送，
+    就调用Simulator那边的broadcast函数发送首帧
+    并等到发送时间足够后再次调用broadcast函数发送尾帧
+    */
     send(origin) {
         if (origin.userData.goals.length == 0) {
             return

@@ -11,6 +11,7 @@ class Manager {
     stage;
     layer;
 
+    // 模版的程序入口
     init(divObj) {
         const stage = new Stage(divObj);
         const layer = new Layer('default');
@@ -26,6 +27,7 @@ class Manager {
         this.initEvent();
     }
 
+    // 加载初始配置
     loadConfig() {
         const stage = this.stage;
         const layer = this.layer;
@@ -33,6 +35,7 @@ class Manager {
             background: 'white',
         });
 
+        // 这里是删除模板里面多余的按钮
         var cnt;
         let toRemoveSearchBox = stage.toolbar.domObj.childNodes;
         let toRemoveGroup = [];
@@ -47,6 +50,7 @@ class Manager {
             cnt = cnt + 1;
         });
 
+        // 这里是设置当导入json文件存档后自动更新画布颜色并为child添加响应事件，以及初始化一些属性
         stage.toolbar.fileInput.addEventListener('change', () => {
             let sleep = time => {
                 return new Promise(resolve => setTimeout(resolve, time));
@@ -70,6 +74,7 @@ class Manager {
             })
         });
 
+        // 增加一个开始执行模拟的按钮，点击后调用Executor的execute函数
         let img = document.createElement('img');
         img.src = 'imges\\开始.svg';
         img.style.width = '24px';
@@ -83,6 +88,8 @@ class Manager {
             this.executor.execute();
         })
 
+        // 不会导出consol.log()信息到文本文档，所以这里不做了
+
         // img = document.createElement('img');
         // img.src = 'imges\\查看.svg';
         // img.style.width = '24px';
@@ -94,6 +101,7 @@ class Manager {
 
     }
 
+    // 初始化响应事件，不再赘述，看看API玩玩程序就懂了
     initEvent() {
         const stage = this.stage;
         const layer = this.layer;

@@ -1,5 +1,11 @@
 class Provider {
 
+    /* 
+    新建一个节点，
+    并分配名字为鼠标点击位置的画布坐标，
+    并添加更新名字的拖拽事件响应，
+    使得名字一直是画布坐标位置
+    */
     newNode(mode, x, y) {
         let node;
         let text = mode + x.toFixed(0).toString() + ":" + y.toFixed(0).toString();
@@ -14,6 +20,12 @@ class Provider {
         return node;
     }
 
+    /* 
+    新建一个信道，
+    并分配名字为两节点之间的距离，
+    并添加更新名字的拖拽事件响应，
+    使得名字一直是两节点之间的距离
+    */
     newLink(node1, node2) {
         var repeat = false;
         if (node1.userData.customClassName == 'HostNode' && node2.userData.customClassName == 'HostNode') {
@@ -37,6 +49,7 @@ class Provider {
         return link;
     }
 
+    // 用于拖拽后更新节点的坐标和信道的长度
     updateNode(node) {
         if (node.userData.customClassName == 'HostNode') {
             node.setText('终端' + node.x.toFixed(0).toString() + ":" + node.y.toFixed(0).toString())
